@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chiikawa 收藏與許願池 💖</title>
+  <title>Chiikawa 模範收藏與許願池 💖</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Mochiy+Pop+One&family=Zen+Maru+Gothic:wght@500;700;900&display=swap');
 
@@ -14,12 +14,10 @@
       --yellow-star: #fff3a0;
       --blue-soft: #e2f0d9;
       --text-color: #5c4b51;
-      --white-card: rgba(255, 255, 255, 0.9);
+      --white-card: rgba(255, 255, 255, 0.95);
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       font-family: 'Zen Maru Gothic', 'Mochiy Pop One', cursive, sans-serif;
@@ -186,12 +184,11 @@
       border-color: var(--pink-primary);
     }
 
-    /* 刪除按鈕 */
-    .delete-btn {
+    /* 操作按鈕群（修改 & 刪除） */
+    .action-btn {
       position: absolute;
       top: 8px;
-      right: 8px;
-      background: rgba(255, 255, 255, 0.85);
+      background: rgba(255, 255, 255, 0.9);
       border: none;
       border-radius: 50%;
       width: 28px;
@@ -206,11 +203,11 @@
       z-index: 2;
     }
 
-    .delete-btn:hover {
-      background: #ff4d6d;
-      color: white;
-      transform: scale(1.15);
-    }
+    .edit-btn { right: 40px; }
+    .edit-btn:hover { background: #ffca3a; transform: scale(1.15); }
+
+    .delete-btn { right: 8px; }
+    .delete-btn:hover { background: #ff4d6d; color: white; transform: scale(1.15); }
 
     .card img {
       width: 100%;
@@ -257,11 +254,48 @@
       color: #ff758f;
       font-weight: bold;
     }
+
+    /* 彈窗背景與內容 */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+      backdrop-filter: blur(3px);
+    }
+
+    .modal {
+      background: white;
+      padding: 25px;
+      border-radius: 25px;
+      width: 90%;
+      max-width: 400px;
+      border: 4px solid var(--pink-primary);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+
+    .modal h2 { margin-top: 0; color: var(--pink-dark); font-size: 18px; }
+
+    .modal-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .btn-save {
+      background: #8ac926; color: white; border: none; padding: 10px; border-radius: 15px; flex: 1; font-family: inherit; font-weight: bold; cursor: pointer;
+    }
+    .btn-cancel {
+      background: #ccc; color: white; border: none; padding: 10px; border-radius: 15px; flex: 1; font-family: inherit; font-weight: bold; cursor: pointer;
+    }
   </style>
 </head>
 <body>
 
-  <h1>( •̀⤙•́ ) Chiikawa 收藏庫 💖</h1>
+  <h1>( •̀⤙•́ ) Chiikawa 模範收藏庫 💖</h1>
 
   <!-- 新增公仔表單 -->
   <div class="form-container">
@@ -292,6 +326,26 @@
   <!-- 資料展示區 -->
   <div class="grid" id="gallery"><p class="empty-msg">載入中... 🐾</p></div>
 
+  <!-- 修改資料彈窗 (Modal) -->
+  <div class="modal-overlay" id="editModal">
+    <div class="modal">
+      <h2>✏️ 修改公仔資訊</h2>
+      <input type="hidden" id="editKey">
+      <div class="form-group">
+        <input type="text" id="editName" placeholder="公仔名稱">
+        <input type="url" id="editImage" placeholder="圖片網址 URL">
+        <select id="editStatus">
+          <option value="owned">🛍️ 已擁有 (Owned)</option>
+          <option value="wish">💫 許願池 (Wishlist)</option>
+        </select>
+      </div>
+      <div class="modal-buttons">
+        <button class="btn-save" onclick="saveEdit()">💾 儲存變更</button>
+        <button class="btn-cancel" onclick="closeModal()">❌ 取消</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     const BASE_DB_URL = "https://chiikawa-2ca7d-default-rtdb.firebaseio.com/items";
     let allItems = {};
@@ -308,7 +362,7 @@
       }
     }
 
-    // 渲染卡片 (同時處理「分類」與「關鍵字搜尋」)
+    // 渲染卡片
     function renderItems() {
       const gallery = document.getElementById('gallery');
       const searchQuery = document.getElementById('searchInput').value.trim().toLowerCase();
@@ -326,10 +380,7 @@
         const item = allItems[key];
         if (!item) return;
 
-        // 1. 分類過濾
         if (currentFilter !== 'all' && item.status !== currentFilter) return;
-
-        // 2. 搜尋關鍵字過濾
         if (searchQuery && !item.name.toLowerCase().includes(searchQuery)) return;
 
         count++;
@@ -340,7 +391,8 @@
         const card = document.createElement('div');
         card.className = 'card';
         card.innerHTML = `
-          <button class="delete-btn" onclick="deleteItem('${key}', '${item.name}')" title="刪除此公仔">🗑️</button>
+          <button class="action-btn edit-btn" onclick="openModal('${key}')" title="修改資訊">✏️</button>
+          <button class="action-btn delete-btn" onclick="deleteItem('${key}', '${item.name}')" title="刪除此公仔">🗑️</button>
           <img src="${item.image}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/160?text=No+Image'">
           <h3>${item.name}</h3>
           <span class="badge ${badgeClass}">${badgeText}</span>
@@ -387,6 +439,57 @@
         }
       } catch (err) {
         alert('發生錯誤：' + err.message);
+      }
+    }
+
+    // 開啟修改彈窗並帶入舊資料
+    function openModal(key) {
+      const item = allItems[key];
+      if (!item) return;
+
+      document.getElementById('editKey').value = key;
+      document.getElementById('editName').value = item.name;
+      document.getElementById('editImage').value = item.image;
+      document.getElementById('editStatus').value = item.status;
+
+      document.getElementById('editModal').style.display = 'flex';
+    }
+
+    // 關閉彈窗
+    function closeModal() {
+      document.getElementById('editModal').style.display = 'none';
+    }
+
+    // 儲存修改 (PUT)
+    async function saveEdit() {
+      const key = document.getElementById('editKey').value;
+      const name = document.getElementById('editName').value.trim();
+      const image = document.getElementById('editImage').value.trim();
+      const status = document.getElementById('editStatus').value;
+
+      if (!name || !image) {
+        alert('名稱與圖片 URL 不能留空喔！');
+        return;
+      }
+
+      const updatedItem = { name, image, status };
+
+      try {
+        // 使用 PUT 請求覆蓋該 key 對應的資料
+        const res = await fetch(`${BASE_DB_URL}/${key}.json`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updatedItem)
+        });
+
+        if (res.ok) {
+          closeModal();
+          loadData();
+        } else {
+          alert('修改失敗，請檢查 Firebase 權限！');
+        }
+      } catch (err) {
+        alert('儲存時發生錯誤：' + err.message);
       }
     }
 

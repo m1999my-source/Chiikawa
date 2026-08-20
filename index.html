@@ -158,17 +158,17 @@
       transform: scale(1.05);
     }
 
-    /* 展覽卡片區 */
+    /* 展覽卡片區 (電腦版) */
     .grid {
       display: flex;
       flex-wrap: wrap;
-      gap: 22px;
+      gap: 18px;
       justify-content: center;
       max-width: 1000px;
       margin: 0 auto;
     }
 
-    /* 公仔卡片 */
+    /* 公仔卡片 (電腦版) */
     .card {
       background: #fff;
       border: 3px solid #ffe3e8;
@@ -296,11 +296,61 @@
     .btn-cancel {
       background: #ccc; color: white; border: none; padding: 10px; border-radius: 15px; flex: 1; font-family: inherit; font-weight: bold; cursor: pointer;
     }
+
+    /* 📱 手機版微調：一排 3 個 */
+    @media (max-width: 600px) {
+      body {
+        padding: 15px 5px;
+      }
+
+      h1 {
+        font-size: 1.6rem;
+        margin-bottom: 15px;
+      }
+
+      .grid {
+        gap: 6px;
+      }
+
+      .card {
+        width: calc(33.33% - 4px); /* 剛好三分之一比例 */
+        padding: 6px;
+        border-radius: 12px;
+        border-width: 2px;
+      }
+
+      .card img {
+        height: 90px;
+        border-radius: 8px;
+      }
+
+      .card h3 {
+        font-size: 11px;
+        margin: 5px 0 2px 0;
+        word-break: break-all;
+      }
+
+      .badge {
+        font-size: 9px;
+        padding: 2px 4px;
+        border-radius: 8px;
+      }
+
+      .action-btn {
+        width: 20px;
+        height: 20px;
+        font-size: 9px;
+        top: 4px;
+      }
+
+      .edit-btn { right: 26px; }
+      .delete-btn { right: 4px; }
+    }
   </style>
 </head>
 <body>
 
-  <h1>( •̀⤙•́ ) Chiikawa 收藏庫 💖</h1>
+  <h1>( •̀⤙•́ ) Chiikawa 收藏庫💖</h1>
 
   <!-- 新增公仔表單 -->
   <div class="form-container">
@@ -389,7 +439,7 @@
         count++;
         const isWish = item.status === 'wish';
         const badgeClass = isWish ? 'badge-wish' : 'badge-owned';
-        const badgeText = isWish ? '💫 許願中' : '🛍️ 已擁有';
+        const badgeText = isWish ? '💫 許願' : '🛍️ 擁有';
 
         const card = document.createElement('div');
         card.className = 'card';

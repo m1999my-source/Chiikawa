@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chiikawa 模範收藏與許願池 💖</title>
+  <title>Chiikawa 收藏與許願池 💖</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Mochiy+Pop+One&family=Zen+Maru+Gothic:wght@500;700;900&display=swap');
 
@@ -24,7 +24,6 @@
     body {
       font-family: 'Zen Maru Gothic', 'Mochiy Pop One', cursive, sans-serif;
       background-color: #fce4ec;
-      /* 可愛波點背景 */
       background-image: radial-gradient(#ffccd5 15%, transparent 16%), radial-gradient(#ffccd5 15%, transparent 16%);
       background-size: 30px 30px;
       background-position: 0 0, 15px 15px;
@@ -49,7 +48,7 @@
       100% { transform: translateY(-8px) rotate(1deg); }
     }
 
-    /* 可愛區塊容器 */
+    /* 表單區塊 */
     .form-container {
       background: var(--white-card);
       max-width: 480px;
@@ -91,7 +90,7 @@
       box-shadow: 0 0 8px rgba(255, 133, 162, 0.4);
     }
 
-    /* 可愛糖果按鈕 */
+    /* 按鈕 */
     button.btn-add {
       background: linear-gradient(135deg, #ff85a2, #ffacb7);
       color: white;
@@ -112,7 +111,7 @@
       box-shadow: 0 0px 0px #e05d82;
     }
 
-    /* 可愛切換分頁 */
+    /* 切換分頁 */
     .tabs {
       display: flex;
       justify-content: center;
@@ -152,7 +151,7 @@
       margin: 0 auto;
     }
 
-    /* 公仔卡片風格 */
+    /* 公仔卡片 */
     .card {
       background: #fff;
       border: 3px solid #ffe3e8;
@@ -167,11 +166,36 @@
       align-items: center;
     }
 
-    /* 懸浮效果 */
     .card:hover {
       transform: translateY(-8px) scale(1.03);
       box-shadow: 0 15px 25px rgba(255, 133, 162, 0.4);
       border-color: var(--pink-primary);
+    }
+
+    /* 刪除按鈕風格 */
+    .delete-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(255, 255, 255, 0.85);
+      border: none;
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      transition: all 0.2s;
+      z-index: 2;
+    }
+
+    .delete-btn:hover {
+      background: #ff4d6d;
+      color: white;
+      transform: scale(1.15);
     }
 
     .card img {
@@ -190,7 +214,7 @@
       font-weight: 700;
     }
 
-    /* 可愛膠囊標籤 */
+    /* 標籤 */
     .badge {
       display: inline-block;
       padding: 4px 12px;
@@ -212,7 +236,6 @@
       border: 1px solid #ffe0b2;
     }
 
-    /* 提示無資料的可愛風格 */
     .empty-msg {
       background: rgba(255, 255, 255, 0.8);
       padding: 20px 40px;
@@ -251,13 +274,15 @@
   <div class="grid" id="gallery"><p class="empty-msg">載入中... 🐾</p></div>
 
   <script>
-    const DB_URL = "https://chiikawa-2ca7d-default-rtdb.firebaseio.com/items.json";
+    // Firebase 資料庫基本 URL
+    const BASE_DB_URL = "https://chiikawa-2ca7d-default-rtdb.firebaseio.com/items";
     let allItems = {};
     let currentFilter = 'all';
 
+    // 載入資料
     async function loadData() {
       try {
-        const response = await fetch(DB_URL);
+        const response = await fetch(`${BASE_DB_URL}.json`);
         allItems = await response.json() || {};
         renderItems(currentFilter);
       } catch (err) {
@@ -265,6 +290,7 @@
       }
     }
 
+    // 渲染卡片
     function renderItems(filter) {
       const gallery = document.getElementById('gallery');
       gallery.innerHTML = '';
@@ -272,7 +298,7 @@
       const keys = Object.keys(allItems);
 
       if (keys.length === 0) {
-        gallery.innerHTML = '<p class="empty-msg">目前還沒有公仔，快來新增第一個吧！(  •̀-•́)</p>';
+        gallery.innerHTML = '<p class="empty-msg">目前還沒有公仔，快來新增第一個吧！( •̀-•́)</p>';
         return;
       }
 
@@ -291,6 +317,7 @@
         const card = document.createElement('div');
         card.className = 'card';
         card.innerHTML = `
+          <button class="delete-btn" onclick="deleteItem('${key}', '${item.name}')" title="刪除此公仔">🗑️</button>
           <img src="${item.image}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/160?text=No+Image'">
           <h3>${item.name}</h3>
           <span class="badge ${badgeClass}">${badgeText}</span>
@@ -303,6 +330,7 @@
       }
     }
 
+    // 新增資料 (POST)
     async function addItem() {
       const name = document.getElementById('itemName').value.trim();
       const image = document.getElementById('itemImage').value.trim();
@@ -316,7 +344,7 @@
       const newItem = { name, image, status };
 
       try {
-        const res = await fetch(DB_URL, {
+        const res = await fetch(`${BASE_DB_URL}.json`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(newItem)
@@ -327,13 +355,36 @@
           document.getElementById('itemImage').value = '';
           loadData();
         } else {
-          alert('新增失敗，請檢查 Firebase Rules 權限！');
+          alert('新增失敗，請確認 Firebase Rules 權限！');
         }
       } catch (err) {
         alert('發生錯誤：' + err.message);
       }
     }
 
+    // 刪除資料 (DELETE)
+    async function deleteItem(key, name) {
+      if (!confirm(`確定要刪除「${name}」嗎？( 😭 )`)) {
+        return;
+      }
+
+      try {
+        // 向 Firebase 指定 Key 的路徑發送 DELETE 請求
+        const res = await fetch(`${BASE_DB_URL}/${key}.json`, {
+          method: 'DELETE'
+        });
+
+        if (res.ok) {
+          loadData(); // 重新讀取畫面
+        } else {
+          alert('刪除失敗，請檢查 Firebase 權限！');
+        }
+      } catch (err) {
+        alert('刪除時發生錯誤：' + err.message);
+      }
+    }
+
+    // 切換分頁
     function filterItems(status, event) {
       currentFilter = status;
       document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));

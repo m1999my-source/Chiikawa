@@ -4,6 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Chiikawa 收藏與許願池 💖</title>
+  
+  <!-- 網站 Icon 設定 -->
+  <link rel="icon" href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSS5NdSvl7OLTW3o8nYxASsmza9fUpW_k9vM0h3YC4atJGSlRFTnKadLH8&s=10" type="image/x-icon">
+  <link rel="apple-touch-icon" href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSS5NdSvl7OLTW3o8nYxASsmza9fUpW_k9vM0h3YC4atJGSlRFTnKadLH8&s=10">
+
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Mochiy+Pop+One&family=Zen+Maru+Gothic:wght@500;700;900&display=swap');
 
@@ -351,7 +356,6 @@
     let allItems = {};
     let currentFilter = 'all';
 
-    // 載入資料
     async function loadData() {
       try {
         const response = await fetch(`${BASE_DB_URL}.json`);
@@ -362,7 +366,6 @@
       }
     }
 
-    // 渲染卡片
     function renderItems() {
       const gallery = document.getElementById('gallery');
       const searchQuery = document.getElementById('searchInput').value.trim().toLowerCase();
@@ -405,12 +408,10 @@
       }
     }
 
-    // 搜尋即時監聽
     function handleSearch() {
       renderItems();
     }
 
-    // 新增資料 (POST)
     async function addItem() {
       const name = document.getElementById('itemName').value.trim();
       const image = document.getElementById('itemImage').value.trim();
@@ -442,7 +443,6 @@
       }
     }
 
-    // 開啟修改彈窗並帶入舊資料
     function openModal(key) {
       const item = allItems[key];
       if (!item) return;
@@ -455,12 +455,10 @@
       document.getElementById('editModal').style.display = 'flex';
     }
 
-    // 關閉彈窗
     function closeModal() {
       document.getElementById('editModal').style.display = 'none';
     }
 
-    // 儲存修改 (PUT)
     async function saveEdit() {
       const key = document.getElementById('editKey').value;
       const name = document.getElementById('editName').value.trim();
@@ -475,7 +473,6 @@
       const updatedItem = { name, image, status };
 
       try {
-        // 使用 PUT 請求覆蓋該 key 對應的資料
         const res = await fetch(`${BASE_DB_URL}/${key}.json`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
@@ -493,7 +490,6 @@
       }
     }
 
-    // 刪除資料 (DELETE)
     async function deleteItem(key, name) {
       if (!confirm(`確定要刪除「${name}」嗎？( 😭 )`)) {
         return;
@@ -514,7 +510,6 @@
       }
     }
 
-    // 切換分頁
     function filterItems(status, event) {
       currentFilter = status;
       document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));

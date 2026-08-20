@@ -1,156 +1,347 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chiikawa 公仔收藏與許願池</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Chiikawa 模範收藏與許願池 💖</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Mochiy+Pop+One&family=Zen+Maru+Gothic:wght@500;700;900&display=swap');
+
+    :root {
+      --pink-primary: #ffb7c5;
+      --pink-soft: #fff0f5;
+      --pink-dark: #ff85a2;
+      --yellow-star: #fff3a0;
+      --blue-soft: #e2f0d9;
+      --text-color: #5c4b51;
+      --white-card: rgba(255, 255, 255, 0.9);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Zen Maru Gothic', 'Mochiy Pop One', cursive, sans-serif;
+      background-color: #fce4ec;
+      /* 可愛波點背景 */
+      background-image: radial-gradient(#ffccd5 15%, transparent 16%), radial-gradient(#ffccd5 15%, transparent 16%);
+      background-size: 30px 30px;
+      background-position: 0 0, 15px 15px;
+      color: var(--text-color);
+      text-align: center;
+      margin: 0;
+      padding: 30px 15px;
+    }
+
+    /* 標題動畫 */
+    h1 {
+      color: #ff6b8b;
+      font-size: 2.2rem;
+      text-shadow: 3px 3px 0px #fff, 5px 5px 0px #ffccd5;
+      margin-bottom: 25px;
+      display: inline-block;
+      animation: bounce 2s infinite alternate ease-in-out;
+    }
+
+    @keyframes bounce {
+      0% { transform: translateY(0) rotate(-1deg); }
+      100% { transform: translateY(-8px) rotate(1deg); }
+    }
+
+    /* 可愛區塊容器 */
+    .form-container {
+      background: var(--white-card);
+      max-width: 480px;
+      margin: 0 auto 35px auto;
+      padding: 25px;
+      border-radius: 25px;
+      border: 4px solid #fff;
+      box-shadow: 0 10px 20px rgba(255, 183, 197, 0.4);
+      backdrop-filter: blur(5px);
+    }
+
+    .form-container h2 {
+      margin-top: 0;
+      font-size: 18px;
+      color: var(--pink-dark);
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    input, select {
+      padding: 12px 16px;
+      border: 2px solid #ffccd5;
+      border-radius: 15px;
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      background: #fff;
+      color: var(--text-color);
+      transition: all 0.2s;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--pink-dark);
+      box-shadow: 0 0 8px rgba(255, 133, 162, 0.4);
+    }
+
+    /* 可愛糖果按鈕 */
+    button.btn-add {
+      background: linear-gradient(135deg, #ff85a2, #ffacb7);
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 20px;
+      font-size: 16px;
+      font-weight: 900;
+      font-family: inherit;
+      cursor: pointer;
+      box-shadow: 0 4px 0px #e05d82;
+      transition: all 0.1s;
+      width: 100%;
+    }
+
+    button.btn-add:active {
+      transform: translateY(4px);
+      box-shadow: 0 0px 0px #e05d82;
+    }
+
+    /* 可愛切換分頁 */
+    .tabs {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      background: #fff;
+      border: 3px solid #ffb7c5;
+      color: #ff758f;
+      padding: 8px 20px;
+      border-radius: 30px;
+      cursor: pointer;
+      font-weight: 700;
+      font-family: inherit;
+      font-size: 15px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn.active, .tab-btn:hover {
+      background: #ff758f;
+      color: white;
+      border-color: #ff758f;
+      transform: scale(1.05);
+    }
+
+    /* 展覽卡片區 */
+    .grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 22px;
+      justify-content: center;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    /* 公仔卡片風格 */
+    .card {
+      background: #fff;
+      border: 3px solid #ffe3e8;
+      border-radius: 22px;
+      padding: 15px;
+      width: 190px;
+      box-shadow: 0 8px 15px rgba(255, 183, 197, 0.3);
+      position: relative;
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* 懸浮效果 */
+    .card:hover {
+      transform: translateY(-8px) scale(1.03);
+      box-shadow: 0 15px 25px rgba(255, 133, 162, 0.4);
+      border-color: var(--pink-primary);
+    }
+
+    .card img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      border-radius: 16px;
+      background-color: #fffafb;
+      border: 2px dashed #ffccd5;
+    }
+
+    .card h3 {
+      font-size: 16px;
+      margin: 12px 0 6px 0;
+      color: #4a3e3d;
+      font-weight: 700;
+    }
+
+    /* 可愛膠囊標籤 */
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      font-size: 12px;
+      border-radius: 15px;
+      font-weight: bold;
+      margin-top: 4px;
+    }
+
+    .badge-owned {
+      background-color: #e8f8f5;
+      color: #2e8b57;
+      border: 1px solid #b2edd4;
+    }
+
+    .badge-wish {
+      background-color: #fff5e6;
+      color: #ff8c00;
+      border: 1px solid #ffe0b2;
+    }
+
+    /* 提示無資料的可愛風格 */
+    .empty-msg {
+      background: rgba(255, 255, 255, 0.8);
+      padding: 20px 40px;
+      border-radius: 20px;
+      color: #ff758f;
+      font-weight: bold;
+    }
+  </style>
 </head>
-<body class="bg-pink-50 min-h-screen p-6">
-  <div class="max-w-4xl mx-auto">
-    <h1 class="text-3xl font-bold text-center text-pink-600 mb-6">💖 Chiikawa 公仔圖鑑</h1>
+<body>
 
-    <!-- 頁籤切換 (Tabs) -->
-    <div class="flex justify-center mb-6 gap-4">
-      <button id="tab-owned" onclick="switchTab('owned')" class="px-6 py-2 rounded-full font-bold bg-pink-500 text-white shadow">
-        🏠 我的收藏 (已擁有)
-      </button>
-      <button id="tab-wishlist" onclick="switchTab('wishlist')" class="px-6 py-2 rounded-full font-bold bg-white text-pink-500 hover:bg-pink-100 shadow">
-        🌟 許願清單 (想要)
-      </button>
-    </div>
+  <h1>( •̀⤙•́ ) Chiikawa 模範收藏庫 💖</h1>
 
-    <!-- 新增公仔表單 -->
-    <form id="add-form" class="bg-white p-4 rounded-xl shadow-md mb-8 flex flex-col md:flex-row gap-3">
-      <input type="text" id="name" placeholder="公仔名稱 (例: 睡衣吉伊)" required class="border p-2 rounded flex-1">
-      <input type="text" id="series" placeholder="系列 (例: 魔法少女)" required class="border p-2 rounded flex-1">
-      <input type="url" id="image" placeholder="圖片網址 (URL)" required class="border p-2 rounded flex-1">
-      
-      <!-- 選擇新增類型 -->
-      <select id="status-input" class="border p-2 rounded bg-white font-medium text-gray-700">
-        <option value="owned">標記為：已擁有</option>
-        <option value="wishlist">標記為：許願中</option>
+  <!-- 新增公仔表單 -->
+  <div class="form-container">
+    <h2>✨ 新增公仔 / 許願清單 ✨</h2>
+    <div class="form-group">
+      <input type="text" id="itemName" placeholder="公仔名稱 (例：睡衣吉伊卡哇)" required>
+      <input type="url" id="itemImage" placeholder="圖片網址 URL (https://...)" required>
+      <select id="itemStatus">
+        <option value="owned">🛍️ 已擁有 (Owned)</option>
+        <option value="wish">💫 許願池 (Wishlist)</option>
       </select>
-
-      <button type="submit" class="bg-pink-500 hover:bg-pink-600 text-white px-6 py-2 rounded-lg font-bold transition">新增卡片</button>
-    </form>
-
-    <!-- 卡片展示列表 -->
-    <div id="collection-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
+    </div>
+    <button class="btn-add" onclick="addItem()">➕ 送出新增！</button>
   </div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+  <!-- 分頁標籤 -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="filterItems('all', event)">✨ 全部展示</button>
+    <button class="tab-btn" onclick="filterItems('owned', event)">🛍️ 已擁有</button>
+    <button class="tab-btn" onclick="filterItems('wish', event)">💫 許願池</button>
+  </div>
 
-    // ⚠️ 請補上其餘的 Firebase API Key（在專案設定 Project Settings 內）
-    const firebaseConfig = {
-      apiKey: "YOUR_API_KEY", // 請替換成你的 API Key
-      authDomain: "chiikawa-2ca7d.firebaseapp.com",
-      databaseURL: "https://chiikawa-2ca7d-default-rtdb.firebaseio.com/",
-      projectId: "chiikawa-2ca7d",
-      storageBucket: "chiikawa-2ca7d.appspot.com",
-      messagingSenderId: "YOUR_SENDER_ID",
-      appId: "YOUR_APP_ID"
-    };
+  <!-- 資料展示區 -->
+  <div class="grid" id="gallery"><p class="empty-msg">載入中... 🐾</p></div>
 
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-    const figuresRef = ref(db, "figures");
+  <script>
+    const DB_URL = "https://chiikawa-2ca7d-default-rtdb.firebaseio.com/items.json";
+    let allItems = {};
+    let currentFilter = 'all';
 
-    let currentTab = "owned";
-    let allFigures = [];
-
-    // 即時讀取 Realtime Database 資料
-    onValue(figuresRef, (snapshot) => {
-      allFigures = [];
-      const data = snapshot.val();
-      if (data) {
-        Object.keys(data).forEach((key) => {
-          allFigures.push({ id: key, ...data[key] });
-        });
+    async function loadData() {
+      try {
+        const response = await fetch(DB_URL);
+        allItems = await response.json() || {};
+        renderItems(currentFilter);
+      } catch (err) {
+        document.getElementById('gallery').innerHTML = '<p class="empty-msg">😭 資料載入失敗，請檢查網路連線</p>';
       }
-      renderGrid();
-    });
+    }
 
-    // 畫面渲染
-    function renderGrid() {
-      const grid = document.getElementById("collection-grid");
-      grid.innerHTML = "";
+    function renderItems(filter) {
+      const gallery = document.getElementById('gallery');
+      gallery.innerHTML = '';
 
-      const filtered = allFigures.filter(item => (item.status || "owned") === currentTab);
+      const keys = Object.keys(allItems);
 
-      if (filtered.length === 0) {
-        grid.innerHTML = `<div class="col-span-full text-center py-10 text-gray-400">尚無內容，快在上方新增吧！</div>`;
+      if (keys.length === 0) {
+        gallery.innerHTML = '<p class="empty-msg">目前還沒有公仔，快來新增第一個吧！(  •̀-•́)</p>';
         return;
       }
 
-      filtered.forEach((item) => {
-        const card = document.createElement("div");
-        card.className = "bg-white p-3 rounded-xl shadow text-center relative group";
-        
-        const moveBtn = currentTab === "wishlist" 
-          ? `<button onclick="moveToOwned('${item.id}')" class="w-full mt-2 bg-green-500 hover:bg-green-600 text-white text-xs py-1 rounded font-bold transition">🎉 入手！移至已擁有</button>`
-          : '';
+      let count = 0;
+      keys.forEach(key => {
+        const item = allItems[key];
+        if (!item) return;
 
+        if (filter !== 'all' && item.status !== filter) return;
+
+        count++;
+        const isWish = item.status === 'wish';
+        const badgeClass = isWish ? 'badge-wish' : 'badge-owned';
+        const badgeText = isWish ? '💫 許願中' : '🛍️ 已擁有';
+
+        const card = document.createElement('div');
+        card.className = 'card';
         card.innerHTML = `
-          <img src="${item.image}" alt="${item.name}" class="w-full h-40 object-cover rounded-lg mb-2" onerror="this.src='https://via.placeholder.com/150?text=無圖片'">
-          <h3 class="font-bold text-gray-800">${item.name}</h3>
-          <p class="text-xs text-pink-500 mb-1">${item.series}</p>
-          ${moveBtn}
-          <button onclick="deleteItem('${item.id}')" class="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition">刪除</button>
+          <img src="${item.image}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/160?text=No+Image'">
+          <h3>${item.name}</h3>
+          <span class="badge ${badgeClass}">${badgeText}</span>
         `;
-        grid.appendChild(card);
+        gallery.appendChild(card);
       });
+
+      if (count === 0) {
+        gallery.innerHTML = '<p class="empty-msg">這個分類裡面空空的～ 🐾</p>';
+      }
     }
 
-    // 頁籤切換
-    window.switchTab = (tab) => {
-      currentTab = tab;
-      const btnOwned = document.getElementById("tab-owned");
-      const btnWishlist = document.getElementById("tab-wishlist");
+    async function addItem() {
+      const name = document.getElementById('itemName').value.trim();
+      const image = document.getElementById('itemImage').value.trim();
+      const status = document.getElementById('itemStatus').value;
 
-      if (tab === "owned") {
-        btnOwned.className = "px-6 py-2 rounded-full font-bold bg-pink-500 text-white shadow";
-        btnWishlist.className = "px-6 py-2 rounded-full font-bold bg-white text-pink-500 hover:bg-pink-100 shadow";
-      } else {
-        btnWishlist.className = "px-6 py-2 rounded-full font-bold bg-pink-500 text-white shadow";
-        btnOwned.className = "px-6 py-2 rounded-full font-bold bg-white text-pink-500 hover:bg-pink-100 shadow";
+      if (!name || !image) {
+        alert('請填寫名稱與圖片 URL 喔！( • ɞ • )');
+        return;
       }
 
-      renderGrid();
-    };
+      const newItem = { name, image, status };
 
-    // 新增資料到 Realtime Database
-    document.getElementById("add-form").addEventListener("submit", (e) => {
-      e.preventDefault();
-      const statusSelect = document.getElementById("status-input").value;
+      try {
+        const res = await fetch(DB_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(newItem)
+        });
 
-      push(figuresRef, {
-        name: document.getElementById("name").value,
-        series: document.getElementById("series").value,
-        image: document.getElementById("image").value,
-        status: statusSelect,
-        createdAt: Date.now()
-      });
-
-      switchTab(statusSelect);
-      e.target.reset();
-    });
-
-    // 移至已擁有
-    window.moveToOwned = (id) => {
-      const itemRef = ref(db, `figures/${id}`);
-      update(itemRef, { status: "owned" });
-    };
-
-    // 刪除資料
-    window.deleteItem = (id) => {
-      if (confirm("確定要刪除這張卡片嗎？")) {
-        const itemRef = ref(db, `figures/${id}`);
-        remove(itemRef);
+        if (res.ok) {
+          document.getElementById('itemName').value = '';
+          document.getElementById('itemImage').value = '';
+          loadData();
+        } else {
+          alert('新增失敗，請檢查 Firebase Rules 權限！');
+        }
+      } catch (err) {
+        alert('發生錯誤：' + err.message);
       }
-    };
+    }
+
+    function filterItems(status, event) {
+      currentFilter = status;
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+      renderItems(status);
+    }
+
+    loadData();
   </script>
 </body>
 </html>

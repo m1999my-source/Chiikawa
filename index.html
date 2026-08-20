@@ -21,22 +21,18 @@
     </div>
 
     <!-- 新增公仔表單 -->
-    <form id="add-form" class="bg-white p-4 rounded-xl shadow-md mb-8 flex flex-col md:flex-row gap-3 items-center">
-      <input type="text" id="name" placeholder="公仔名稱 (例: 睡衣吉伊)" required class="border p-2 rounded w-full md:w-auto flex-1">
-      <input type="text" id="series" placeholder="系列 (例: 魔法少女)" required class="border p-2 rounded w-full md:w-auto flex-1">
+    <form id="add-form" class="bg-white p-4 rounded-xl shadow-md mb-8 flex flex-col md:flex-row gap-3">
+      <input type="text" id="name" placeholder="公仔名稱 (例: 睡衣吉伊)" required class="border p-2 rounded flex-1">
+      <input type="text" id="series" placeholder="系列 (例: 魔法少女)" required class="border p-2 rounded flex-1">
+      <input type="url" id="image" placeholder="圖片網址 (URL)" required class="border p-2 rounded flex-1">
       
-      <!-- 照片上傳輸入框 -->
-      <input type="file" id="image-file" accept="image/*" required class="border p-1 rounded text-sm w-full md:w-auto flex-1 bg-gray-50">
-
       <!-- 選擇新增類型 -->
-      <select id="status-input" class="border p-2 rounded bg-white font-medium text-gray-700 w-full md:w-auto">
+      <select id="status-input" class="border p-2 rounded bg-white font-medium text-gray-700">
         <option value="owned">標記為：已擁有</option>
         <option value="wishlist">標記為：許願中</option>
       </select>
 
-      <button type="submit" id="submit-btn" class="bg-pink-500 hover:bg-pink-600 text-white px-6 py-2 rounded-lg font-bold transition w-full md:w-auto">
-        新增卡片
-      </button>
+      <button type="submit" class="bg-pink-500 hover:bg-pink-600 text-white px-6 py-2 rounded-lg font-bold transition">新增卡片</button>
     </form>
 
     <!-- 卡片展示列表 -->
@@ -45,37 +41,39 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
+    import { getDatabase, ref, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-    // ⚠️ 請替換為你的 Firebase 金鑰
+    // ⚠️ 請補上其餘的 Firebase API Key（在專案設定 Project Settings 內）
     const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT.firebaseapp.com",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_PROJECT.appspot.com",
+      apiKey: "YOUR_API_KEY", // 請替換成你的 API Key
+      authDomain: "chiikawa-2ca7d.firebaseapp.com",
+      databaseURL: "https://chiikawa-2ca7d-default-rtdb.firebaseio.com/",
+      projectId: "chiikawa-2ca7d",
+      storageBucket: "chiikawa-2ca7d.appspot.com",
       messagingSenderId: "YOUR_SENDER_ID",
       appId: "YOUR_APP_ID"
     };
 
     const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const storage = getStorage(app);
-    const figuresRef = collection(db, "chiikawa_figures");
+    const db = getDatabase(app);
+    const figuresRef = ref(db, "figures");
 
     let currentTab = "owned";
     let allFigures = [];
 
-    // 即時監聽資料庫
-    onSnapshot(figuresRef, (snapshot) => {
+    // 即時讀取 Realtime Database 資料
+    onValue(figuresRef, (snapshot) => {
       allFigures = [];
-      snapshot.forEach((docSnap) => {
-        allFigures.push({ id: docSnap.id, ...docSnap.data() });
-      });
+      const data = snapshot.val();
+      if (data) {
+        Object.keys(data).forEach((key) => {
+          allFigures.push({ id: key, ...data[key] });
+        });
+      }
       renderGrid();
     });
 
-    // 渲染畫面的函式
+    // 畫面渲染
     function renderGrid() {
       const grid = document.getElementById("collection-grid");
       grid.innerHTML = "";
@@ -96,7 +94,7 @@
           : '';
 
         card.innerHTML = `
-          <img src="${item.image}" alt="${item.name}" class="w-full h-40 object-cover rounded-lg mb-2">
+          <img src="${item.image}" alt="${item.name}" class="w-full h-40 object-cover rounded-lg mb-2" onerror="this.src='https://via.placeholder.com/150?text=無圖片'">
           <h3 class="font-bold text-gray-800">${item.name}</h3>
           <p class="text-xs text-pink-500 mb-1">${item.series}</p>
           ${moveBtn}
@@ -106,7 +104,7 @@
       });
     }
 
-    // 切換頁籤
+    // 頁籤切換
     window.switchTab = (tab) => {
       currentTab = tab;
       const btnOwned = document.getElementById("tab-owned");
@@ -123,62 +121,34 @@
       renderGrid();
     };
 
-    // 表單提交 (包含圖片上傳處理)
-    document.getElementById("add-form").addEventListener("submit", async (e) => {
+    // 新增資料到 Realtime Database
+    document.getElementById("add-form").addEventListener("submit", (e) => {
       e.preventDefault();
-      
-      const submitBtn = document.getElementById("submit-btn");
-      const fileInput = document.getElementById("image-file");
-      const file = fileInput.files[0];
       const statusSelect = document.getElementById("status-input").value;
 
-      if (!file) {
-        alert("請選擇一張圖片！");
-        return;
-      }
+      push(figuresRef, {
+        name: document.getElementById("name").value,
+        series: document.getElementById("series").value,
+        image: document.getElementById("image").value,
+        status: statusSelect,
+        createdAt: Date.now()
+      });
 
-      try {
-        submitBtn.disabled = true;
-        submitBtn.innerText = "上傳中...";
-
-        // 1. 上傳圖片至 Firebase Storage
-        const storageRef = ref(storage, `figures/${Date.now()}_${file.name}`);
-        const snapshot = await uploadBytes(storageRef, file);
-        
-        // 2. 取得圖片公開 URL
-        const imageUrl = await getDownloadURL(snapshot.ref);
-
-        // 3. 儲存資料至 Firestore
-        await addDoc(figuresRef, {
-          name: document.getElementById("name").value,
-          series: document.getElementById("series").value,
-          image: imageUrl,
-          status: statusSelect,
-          createdAt: new Date()
-        });
-
-        switchTab(statusSelect);
-        e.target.reset();
-      } catch (error) {
-        console.error("上傳失敗：", error);
-        alert("圖片上傳失敗，請稍後再試！");
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.innerText = "新增卡片";
-      }
+      switchTab(statusSelect);
+      e.target.reset();
     });
 
     // 移至已擁有
-    window.moveToOwned = async (id) => {
-      await updateDoc(doc(db, "chiikawa_figures", id), {
-        status: "owned"
-      });
+    window.moveToOwned = (id) => {
+      const itemRef = ref(db, `figures/${id}`);
+      update(itemRef, { status: "owned" });
     };
 
-    // 刪除公仔
-    window.deleteItem = async (id) => {
+    // 刪除資料
+    window.deleteItem = (id) => {
       if (confirm("確定要刪除這張卡片嗎？")) {
-        await deleteDoc(doc(db, "chiikawa_figures", id));
+        const itemRef = ref(db, `figures/${id}`);
+        remove(itemRef);
       }
     };
   </script>

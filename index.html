@@ -117,7 +117,7 @@
     /* 搜尋欄位 */
     .search-container {
       max-width: 480px;
-      margin: 0 auto 20px auto;
+      margin: 0 auto 15px auto;
     }
 
     .search-input {
@@ -128,34 +128,41 @@
       text-align: center;
     }
 
-    /* 切換分頁 */
+    /* 切換分頁與角色選單 */
+    .filter-group {
+      max-width: 900px;
+      margin: 0 auto 20px auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
     .tabs {
       display: flex;
       justify-content: center;
-      gap: 12px;
-      margin-bottom: 25px;
+      gap: 8px;
       flex-wrap: wrap;
     }
 
     .tab-btn {
       background: #fff;
-      border: 3px solid #ffb7c5;
+      border: 2px solid #ffb7c5;
       color: #ff758f;
-      padding: 8px 20px;
-      border-radius: 30px;
+      padding: 6px 14px;
+      border-radius: 20px;
       cursor: pointer;
       font-weight: 700;
       font-family: inherit;
-      font-size: 15px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      font-size: 13px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
       transition: all 0.2s ease;
+      white-space: nowrap;
     }
 
     .tab-btn.active, .tab-btn:hover {
       background: #ff758f;
       color: white;
       border-color: #ff758f;
-      transform: scale(1.05);
     }
 
     /* 展覽卡片區 (電腦版) */
@@ -173,7 +180,7 @@
       background: #fff;
       border: 3px solid #ffe3e8;
       border-radius: 22px;
-      padding: 15px;
+      padding: 12px;
       width: 190px;
       box-shadow: 0 8px 15px rgba(255, 183, 197, 0.3);
       position: relative;
@@ -216,7 +223,7 @@
 
     .card img {
       width: 100%;
-      height: 160px;
+      height: 150px;
       object-fit: cover;
       border-radius: 16px;
       background-color: #fffafb;
@@ -224,20 +231,27 @@
     }
 
     .card h3 {
-      font-size: 16px;
-      margin: 12px 0 6px 0;
+      font-size: 15px;
+      margin: 8px 0 4px 0;
       color: #4a3e3d;
       font-weight: 700;
     }
 
-    /* 標籤 */
+    /* 標籤容器 */
+    .badge-container {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 4px;
+    }
+
     .badge {
       display: inline-block;
-      padding: 4px 12px;
-      font-size: 12px;
-      border-radius: 15px;
+      padding: 3px 8px;
+      font-size: 11px;
+      border-radius: 12px;
       font-weight: bold;
-      margin-top: 4px;
     }
 
     .badge-owned {
@@ -250,6 +264,12 @@
       background-color: #fff5e6;
       color: #ff8c00;
       border: 1px solid #ffe0b2;
+    }
+
+    .badge-character {
+      background-color: #f0f4ff;
+      color: #4a6fa5;
+      border: 1px solid #cddbfe;
     }
 
     .empty-msg {
@@ -313,27 +333,31 @@
       }
 
       .card {
-        width: calc(33.33% - 4px); /* 剛好三分之一比例 */
-        padding: 6px;
+        width: calc(33.33% - 4px);
+        padding: 5px;
         border-radius: 12px;
         border-width: 2px;
       }
 
       .card img {
-        height: 90px;
+        height: 85px;
         border-radius: 8px;
       }
 
       .card h3 {
         font-size: 11px;
-        margin: 5px 0 2px 0;
+        margin: 4px 0 2px 0;
         word-break: break-all;
       }
 
+      .badge-container {
+        gap: 2px;
+      }
+
       .badge {
-        font-size: 9px;
-        padding: 2px 4px;
-        border-radius: 8px;
+        font-size: 8px;
+        padding: 1px 3px;
+        border-radius: 6px;
       }
 
       .action-btn {
@@ -350,7 +374,7 @@
 </head>
 <body>
 
-  <h1>( •̀⤙•́ ) Chiikawa 收藏庫💖</h1>
+  <h1>( •̀⤙•́ ) Chiikawa收藏庫 </h1>
 
   <!-- 新增公仔表單 -->
   <div class="form-container">
@@ -358,6 +382,16 @@
     <div class="form-group">
       <input type="text" id="itemName" placeholder="公仔名稱 (例：睡衣吉伊卡哇)" required>
       <input type="url" id="itemImage" placeholder="圖片網址 URL (https://...)" required>
+      <select id="itemCharacter">
+        <option value="吉伊卡哇">吉伊卡哇</option>
+        <option value="小八">小八</option>
+        <option value="兔兔">兔兔</option>
+        <option value="飛鼠">飛鼠</option>
+        <option value="栗子饅頭">栗子饅頭</option>
+        <option value="海獺">海獺</option>
+        <option value="風獅"> 風獅</option>
+        <option value="其他">其他</option>
+      </select>
       <select id="itemStatus">
         <option value="owned">🛍️ 已擁有 (Owned)</option>
         <option value="wish">💫 許願池 (Wishlist)</option>
@@ -371,11 +405,27 @@
     <input type="text" id="searchInput" class="search-input" placeholder="🔍 搜尋公仔名稱..." oninput="handleSearch()">
   </div>
 
-  <!-- 分頁標籤 -->
-  <div class="tabs">
-    <button class="tab-btn active" onclick="filterItems('all', event)">✨ 全部展示</button>
-    <button class="tab-btn" onclick="filterItems('owned', event)">🛍️ 已擁有</button>
-    <button class="tab-btn" onclick="filterItems('wish', event)">💫 許願池</button>
+  <!-- 分頁與角色篩選 -->
+  <div class="filter-group">
+    <!-- 狀態篩選 -->
+    <div class="tabs" id="statusTabs">
+      <button class="tab-btn active" onclick="filterStatus('all', event)">✨ 全部狀態</button>
+      <button class="tab-btn" onclick="filterStatus('owned', event)">🛍️ 已擁有</button>
+      <button class="tab-btn" onclick="filterStatus('wish', event)">💫 許願池</button>
+    </div>
+
+    <!-- 角色篩選 -->
+    <div class="tabs" id="characterTabs">
+      <button class="tab-btn active" onclick="filterCharacter('all', event)">🐾 全部角色</button>
+      <button class="tab-btn" onclick="filterCharacter('吉伊卡哇', event)">吉伊卡哇</button>
+      <button class="tab-btn" onclick="filterCharacter('小八', event)">小八</button>
+      <button class="tab-btn" onclick="filterCharacter('兔兔', event)">兔兔</button>
+      <button class="tab-btn" onclick="filterCharacter('飛鼠', event)">飛鼠</button>
+      <button class="tab-btn" onclick="filterCharacter('栗子饅頭', event)">栗子饅頭</button>
+      <button class="tab-btn" onclick="filterCharacter('海獺', event)">海獺</button>
+      <button class="tab-btn" onclick="filterCharacter('風獅', event)">風獅</button>
+      <button class="tab-btn" onclick="filterCharacter('其他', event)">其他</button>
+    </div>
   </div>
 
   <!-- 資料展示區 -->
@@ -389,6 +439,16 @@
       <div class="form-group">
         <input type="text" id="editName" placeholder="公仔名稱">
         <input type="url" id="editImage" placeholder="圖片網址 URL">
+        <select id="editCharacter">
+          <option value="吉伊卡哇">吉伊卡哇</option>
+          <option value="小八">小八</option>
+          <option value="兔兔">兔兔</option>
+          <option value="飛鼠">飛鼠</option>
+          <option value="栗子饅頭">栗子饅頭</option>
+          <option value="海獺">海獺</option>
+          <option value="風獅">風獅</option>
+          <option value="其他">其他</option>
+        </select>
         <select id="editStatus">
           <option value="owned">🛍️ 已擁有 (Owned)</option>
           <option value="wish">💫 許願池 (Wishlist)</option>
@@ -404,7 +464,8 @@
   <script>
     const BASE_DB_URL = "https://chiikawa-2ca7d-default-rtdb.firebaseio.com/items";
     let allItems = {};
-    let currentFilter = 'all';
+    let currentStatusFilter = 'all';
+    let currentCharacterFilter = 'all';
 
     async function loadData() {
       try {
@@ -433,7 +494,11 @@
         const item = allItems[key];
         if (!item) return;
 
-        if (currentFilter !== 'all' && item.status !== currentFilter) return;
+        // 預設舊資料若無角色欄位則為 "吉伊卡哇" 或 "其他"
+        const character = item.character || '其他';
+
+        if (currentStatusFilter !== 'all' && item.status !== currentStatusFilter) return;
+        if (currentCharacterFilter !== 'all' && character !== currentCharacterFilter) return;
         if (searchQuery && !item.name.toLowerCase().includes(searchQuery)) return;
 
         count++;
@@ -448,7 +513,10 @@
           <button class="action-btn delete-btn" onclick="deleteItem('${key}', '${item.name}')" title="刪除此公仔">🗑️</button>
           <img src="${item.image}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/160?text=No+Image'">
           <h3>${item.name}</h3>
-          <span class="badge ${badgeClass}">${badgeText}</span>
+          <div class="badge-container">
+            <span class="badge badge-character">${character}</span>
+            <span class="badge ${badgeClass}">${badgeText}</span>
+          </div>
         `;
         gallery.appendChild(card);
       });
@@ -465,6 +533,7 @@
     async function addItem() {
       const name = document.getElementById('itemName').value.trim();
       const image = document.getElementById('itemImage').value.trim();
+      const character = document.getElementById('itemCharacter').value;
       const status = document.getElementById('itemStatus').value;
 
       if (!name || !image) {
@@ -472,7 +541,7 @@
         return;
       }
 
-      const newItem = { name, image, status };
+      const newItem = { name, image, character, status };
 
       try {
         const res = await fetch(`${BASE_DB_URL}.json`, {
@@ -500,6 +569,7 @@
       document.getElementById('editKey').value = key;
       document.getElementById('editName').value = item.name;
       document.getElementById('editImage').value = item.image;
+      document.getElementById('editCharacter').value = item.character || '吉伊卡哇';
       document.getElementById('editStatus').value = item.status;
 
       document.getElementById('editModal').style.display = 'flex';
@@ -513,6 +583,7 @@
       const key = document.getElementById('editKey').value;
       const name = document.getElementById('editName').value.trim();
       const image = document.getElementById('editImage').value.trim();
+      const character = document.getElementById('editCharacter').value;
       const status = document.getElementById('editStatus').value;
 
       if (!name || !image) {
@@ -520,7 +591,7 @@
         return;
       }
 
-      const updatedItem = { name, image, status };
+      const updatedItem = { name, image, character, status };
 
       try {
         const res = await fetch(`${BASE_DB_URL}/${key}.json`, {
@@ -560,9 +631,16 @@
       }
     }
 
-    function filterItems(status, event) {
-      currentFilter = status;
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    function filterStatus(status, event) {
+      currentStatusFilter = status;
+      document.querySelectorAll('#statusTabs .tab-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+      renderItems();
+    }
+
+    function filterCharacter(char, event) {
+      currentCharacterFilter = char;
+      document.querySelectorAll('#characterTabs .tab-btn').forEach(btn => btn.classList.remove('active'));
       event.target.classList.add('active');
       renderItems();
     }
